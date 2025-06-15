@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include 'db.php';
@@ -27,17 +28,112 @@ include 'product.php';
 <meta charset="UTF-8" />
 <title>Product List</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  .kategori-list { margin-bottom: 20px; }
-  .kategori-list a { margin-right: 10px; padding: 8px 12px; background-color: #eee; border-radius: 4px; text-decoration: none; color: #333; }
-  .kategori-list a.active { background-color: #ffe300; font-weight: bold; }
-  .produk-list { display: flex; flex-wrap: wrap; gap: 20px; }
-  .produk-item { border: 1px solid #ddd; padding: 15px; border-radius: 5px; width: 220px; }
-  .produk-item h3 { margin: 0 0 10px 0; }
-  .produk-item p { margin: 5px 0; }
-  .header { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-  .cart-link { background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; margin-left: 10px; }
-  .cart-link:hover { background-color: #218838; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+    margin: 20px;
+  }
+
+  .header {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  h1 {
+    color: #ad1457;
+  }
+
+  .cart-link {
+    background-color: #ec407a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+  .cart-link:hover {
+    background-color: #d81b60;
+  }
+
+  .kategori-list {
+    margin-bottom: 20px;
+  }
+
+  .kategori-list a {
+    margin-right: 10px;
+    padding: 8px 12px;
+    background-color: #f8bbd0;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #880e4f;
+  }
+
+  .kategori-list a.active {
+    background-color: #ec407a;
+    color: white;
+    font-weight: bold;
+  }
+
+  .produk-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .produk-item {
+    border: 1px solid #f8bbd0;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    width: 220px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .produk-item h3 {
+    margin: 0 0 10px 0;
+    color: #ad1457;
+  }
+
+  .produk-item p {
+    margin: 5px 0;
+    color: #4e004e;
+  }
+
+  input[type="number"] {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #f8bbd0;
+    border-radius: 5px;
+  }
+
+  button {
+    background-color: #ec407a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #d81b60;
+  }
+
+  a {
+    color: #ec407a;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
 </style>
 </head>
 <body>
@@ -85,7 +181,7 @@ include 'product.php';
 
         <form method="POST" action="add_to_cart.php" style="margin-top:10px;">
           <input type="hidden" name="product_id" value="<?= $row['id'] ?>">
-          <input type="number" name="quantity" value="1" min="1" style="width:60px;">
+          <input type="number" name="quantity" value="1" min="1">
           <button type="submit">Tambah ke Keranjang</button>
         </form>
 
