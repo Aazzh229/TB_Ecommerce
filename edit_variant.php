@@ -32,9 +32,82 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<form method="POST">
-    Nama Varian: <input type="text" name="variant_name" value="<?= htmlspecialchars($variant['variant_name']) ?>" required><br>
-    Harga: <input type="number" name="price" value="<?= $variant['price'] ?>" step="0.01" required><br>
-    Stok: <input type="number" name="stock" value="<?= $variant['stock'] ?>" required><br>
-    <button type="submit">Update</button>
-</form>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Varian Produk</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-container h2 {
+            margin-bottom: 25px;
+            color: #ad1457;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px;
+            border: 1px solid #f8bbd0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #ec407a;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #d81b60;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Edit Varian Produk</h2>
+    <form method="POST">
+        <label for="variant_name">Nama Varian:</label>
+        <input type="text" name="variant_name" id="variant_name" value="<?= htmlspecialchars($variant['variant_name']) ?>" required>
+
+        <label for="price">Harga:</label>
+        <input type="number" name="price" id="price" value="<?= $variant['price'] ?>" step="0.01" required>
+
+        <label for="stock">Stok:</label>
+        <input type="number" name="stock" id="stock" value="<?= $variant['stock'] ?>" required>
+
+        <button type="submit">Update</button>
+    </form>
+</div>
+
+</body>
+</html>
