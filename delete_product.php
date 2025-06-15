@@ -17,3 +17,16 @@ $conn->query("DELETE FROM products WHERE id = $id");
 header("Location: index.php");
 exit;
 ?>
+
+<!-- Gaya tampilan pink (TIDAK mengubah kode PHP di atas) -->
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+    }
+</style>
