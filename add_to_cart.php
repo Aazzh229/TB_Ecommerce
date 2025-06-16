@@ -8,8 +8,15 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'];
 $error = '';
 $success = '';
+
+// 🚨 Tambahkan pengecekan role di sini:
+if ($role != 'Pembeli') {
+    header("Location: index.php");
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 

@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
 $user = "root";
-$pass = "syifaa_1402";
+$pass = "020205";
 $db = 'ecommerce_db';
 
 

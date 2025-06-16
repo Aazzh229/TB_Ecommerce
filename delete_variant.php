@@ -3,8 +3,8 @@ session_start();
 include 'db.php';
 
 if ($_SESSION['role'] != 'Penjual') {
-    header("Location: index.php");
-    exit;
+    header("Location: index.php");
+    exit;
 }
 
 $id = $_GET['id'];
@@ -17,13 +17,3 @@ $stmt->execute();
 header("Location: edit_product.php?id=$product_id");
 exit;
 ?>
-
-<!-- Tambahan tampilan pink TANPA ubah kode PHP -->
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-        height: 100vh;
-        margin: 0;
-    }
-</style>

@@ -9,19 +9,31 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Ambil isi keranjang user
-$query = "SELECT ci.variant_id, ci.quantity, pv.price, pv.variant_name, p.name as product_name, p.image
-          FROM cart_items ci
-          JOIN product_variants pv ON ci.variant_id = pv.id
-          JOIN products p ON pv.product_id = p.id
-          WHERE ci.user_id = $user_id AND ci.is_checked_out = 0";
+if (!isset($_POST['cart_ids'])) {
+    echo "Tidak ada item yang dipilih untuk checkout.";
+    exit;
+}
 
-$result = $conn->query($query);
+$cart_ids = $_POST['cart_ids'];
+$ids_placeholder = implode(',', array_fill(0, count($cart_ids), '?'));
+
+$query = "
+    SELECT ci.variant_id, ci.quantity, pv.price, pv.variant_name, p.name as product_name, p.image
+    FROM cart_items ci
+    JOIN product_variants pv ON ci.variant_id = pv.id
+    JOIN products p ON pv.product_id = p.id
+    WHERE ci.user_id = ? AND ci.id IN ($ids_placeholder)
+";
+
+$stmt = $conn->prepare($query);
+$stmt->bind_param(str_repeat("i", count($cart_ids) + 1), $user_id, ...$cart_ids);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $items = [];
 $total = 0;
 while ($row = $result->fetch_assoc()) {
-    $subtotal = $row['price'] * $row['quantity'];
+    $subtotal = ($row['price'] / 1000) * $row['quantity'];
     $total += $subtotal;
     $items[] = [
         'product_name' => $row['product_name'],
@@ -33,10 +45,9 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 
-// Biaya tetap contoh
-$shipping_cost = 10000; 
+$shipping_cost = 10000;
 $service_fee = 2000;
-$discount_shipping = -10000; 
+$discount_shipping = -10000;
 $grand_total = $total + $shipping_cost + $service_fee + $discount_shipping;
 ?>
 
@@ -126,7 +137,7 @@ $grand_total = $total + $shipping_cost + $service_fee + $discount_shipping;
             <div class="summary-row">
                 <img src="uploads/<?= htmlspecialchars($item['image']) ?>" alt="">
                 <?= htmlspecialchars($item['product_name']) ?> - <?= htmlspecialchars($item['variant_name']) ?> <br>
-                Qty: <?= $item['quantity'] ?> x Rp<?= number_format($item['price'], 0, ',', '.') ?>
+                Qty: <?= $item['quantity'] ?> x Rp<?= number_format($item['price'] / 1000, 0, ',', '.') ?>
             </div>
         <?php endforeach; ?>
         <div class="summary-row">Subtotal Produk: Rp<?= number_format($total, 0, ',', '.') ?></div>
@@ -137,6 +148,9 @@ $grand_total = $total + $shipping_cost + $service_fee + $discount_shipping;
     </div>
 
     <form action="checkout_proses.php" method="POST">
+        <?php foreach ($cart_ids as $cart_id): ?>
+            <input type="hidden" name="cart_ids[]" value="<?= $cart_id ?>">
+        <?php endforeach; ?>
         <input type="hidden" name="total" value="<?= $grand_total ?>">
 
         <label>Alamat Pengiriman:</label>

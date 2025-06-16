@@ -1,113 +1,205 @@
+
 <?php
 session_start();
 include 'db.php';
 
-if ($_SESSION['role'] != 'Penjual') {
-    header("Location: index.php");
-    exit;
+// Proteksi halaman
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
 }
 
-$id = $_GET['id'];
+$user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'];
 
-$stmt = $conn->prepare("SELECT * FROM product_variants WHERE id = ?");
-$stmt->bind_param("i", $id);
+// Hitung total item di keranjang
+$stmt = $conn->prepare("SELECT SUM(quantity) as total FROM cart_items WHERE user_id = ? AND is_checked_out = 0");
+$stmt->bind_param("i", $user_id);
 $stmt->execute();
-$variant = $stmt->get_result()->fetch_assoc();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$cartCount = $row['total'] ?? 0;
 
-if (!$variant) {
-    die("Varian tidak ditemukan.");
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $variant_name = $_POST['variant_name'];
-    $price = $_POST['price'] * 1000;
-    $stock = $_POST['stock'];
-
-    $stmt = $conn->prepare("UPDATE product_variants SET variant_name=?, price=?, stock=? WHERE id=?");
-    $stmt->bind_param("sdii", $variant_name, $price, $stock, $id);
-    $stmt->execute();
-
-    header("Location: edit_product.php?id=" . $variant['product_id']);
-    exit;
-}
+include 'product.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Edit Varian Produk</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .form-container {
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-        }
-        .form-container h2 {
-            margin-bottom: 25px;
-            color: #ad1457;
-        }
-        label {
-            display: block;
-            text-align: left;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0 20px;
-            border: 1px solid #f8bbd0;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #ec407a;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #d81b60;
-        }
-    </style>
+<meta charset="UTF-8" />
+<title>Product List</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+    margin: 20px;
+  }
+
+  .header {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  h1 {
+    color: #ad1457;
+  }
+
+  .cart-link {
+    background-color: #ec407a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+  .cart-link:hover {
+    background-color: #d81b60;
+  }
+
+  .kategori-list {
+    margin-bottom: 20px;
+  }
+
+  .kategori-list a {
+    margin-right: 10px;
+    padding: 8px 12px;
+    background-color: #f8bbd0;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #880e4f;
+  }
+
+  .kategori-list a.active {
+    background-color: #ec407a;
+    color: white;
+    font-weight: bold;
+  }
+
+  .produk-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .produk-item {
+    border: 1px solid #f8bbd0;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    width: 220px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .produk-item h3 {
+    margin: 0 0 10px 0;
+    color: #ad1457;
+  }
+
+  .produk-item p {
+    margin: 5px 0;
+    color: #4e004e;
+  }
+
+  input[type="number"] {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #f8bbd0;
+    border-radius: 5px;
+  }
+
+  button {
+    background-color: #ec407a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #d81b60;
+  }
+
+  a {
+    color: #ec407a;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
 </head>
 <body>
 
-<div class="form-container">
-    <h2>Edit Varian Produk</h2>
-    <form method="POST">
-        <label for="variant_name">Nama Varian:</label>
-        <input type="text" name="variant_name" id="variant_name" value="<?= htmlspecialchars($variant['variant_name']) ?>" required>
+<div class="header">
+  <h1>Produk</h1>
 
-        <label for="price">Harga:</label>
-        <input type="number" name="price" id="price" value="<?= $variant['price'] ?>" step="0.01" required>
+  <div>
+    <?php if ($role == 'Pembeli'): ?>
+        <a href="cart.php" class="cart-link">Keranjang (<?= $cartCount ?>)</a>
+        <a href="transactions.php" class="cart-link" style="background-color:#ff9800;">Pesanan Saya</a>
+    <?php elseif ($role == 'Penjual'): ?>
+        <a href="orders_seller.php" class="cart-link" style="background-color:#ff9800;">Pesanan Masuk</a>
+    <?php endif; ?>
 
-        <label for="stock">Stok:</label>
-        <input type="number" name="stock" id="stock" value="<?= $variant['stock'] ?>" required>
-
-        <button type="submit">Update</button>
-    </form>
+    <a href="logout.php" class="cart-link" style="background-color:#dc3545;">Logout</a>
+  </div>
 </div>
+
+<div class="kategori-list">
+  <a href="index.php" class="<?= $categoryId === 0 ? 'active' : '' ?>">Semua</a>
+  <?php while ($cat = $categories->fetch_assoc()): ?>
+    <a href="?category_id=<?= $cat['id'] ?>" class="<?= $categoryId === intval($cat['id']) ? 'active' : '' ?>">
+      <?= htmlspecialchars($cat['name']) ?>
+    </a>
+  <?php endwhile; ?>
+</div>
+
+<div class="produk-list">
+  <?php if ($products->num_rows === 0): ?>
+    <p>Tidak ada produk di kategori ini.</p>
+  <?php else: ?>
+    <?php while($row = $products->fetch_assoc()): ?>
+      <div class="produk-item">
+
+        <?php if (!empty($row['image'])): ?>
+          <img src="uploads/<?= htmlspecialchars($row['image']) ?>" width="150"><br>
+        <?php endif; ?>
+
+        <h3><a href="product_detail.php?id=<?= $row['id'] ?>"><?= htmlspecialchars($row['name']) ?></a></h3>
+        <p>Harga: Rp <?= number_format($row['price'], 0, ',', '.') ?></p>
+        <p>Kategori: <?= htmlspecialchars($row['category_name']) ?></p>
+        <p>Merk: <?= htmlspecialchars($row['merk']) ?></p>
+        <p>Deskripsi: <?= nl2br(htmlspecialchars($row['description'])) ?></p>
+
+        <form method="POST" action="add_to_cart.php" style="margin-top:10px;">
+          <input type="hidden" name="product_id" value="<?= $row['id'] ?>">
+          <input type="number" name="quantity" value="1" min="1">
+          <button type="submit">Tambah ke Keranjang</button>
+        </form>
+
+        <?php if ($role == 'Penjual'): ?>
+          <br>
+          <a href="edit_product.php?id=<?= $row['id'] ?>">Edit</a> |
+          <a href="delete_product.php?id=<?= $row['id'] ?>" onclick="return confirm('Yakin mau hapus produk?')">Hapus</a>
+        <?php endif; ?>
+
+      </div>
+    <?php endwhile; ?>
+  <?php endif; ?>
+</div>
+
+<?php if ($role == 'Penjual'): ?>
+  <br>
+  <a href="create_product.php">+ Tambah Produk</a>
+<?php endif; ?>
 
 </body>
 </html>

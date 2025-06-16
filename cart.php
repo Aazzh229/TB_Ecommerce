@@ -2,7 +2,6 @@
 session_start();
 include 'db.php';
 
-// Proteksi login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -109,7 +108,8 @@ $result = $stmt->get_result();
             <?php 
             $total = 0;
             while($row = $result->fetch_assoc()): 
-                $subtotal = $row['price'] * $row['quantity'];
+                $price_rp = $row['price'] / 1000;
+                $subtotal = $price_rp * $row['quantity'];
                 $total += $subtotal;
             ?>
             <tr>
@@ -118,7 +118,7 @@ $result = $stmt->get_result();
                 </td>
                 <td><?= htmlspecialchars($row['name']) ?></td>
                 <td><?= htmlspecialchars($row['variant_name']) ?></td>
-                <td>Rp <?= number_format($row['price'], 0, ',', '.') ?></td>
+                <td>Rp <?= number_format($price_rp, 0, ',', '.') ?></td>
                 <td><?= $row['quantity'] ?></td>
                 <td>Rp <?= number_format($subtotal, 0, ',', '.') ?></td>
             </tr>

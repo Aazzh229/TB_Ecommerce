@@ -82,7 +82,10 @@
 
     <table>
         <tr>
-            <th>Varian</th><th>Harga</th><th>Stok</th><th>Aksi</th>
+            <th>Varian</th>
+            <th>Harga</th>
+            <th>Stok</th>
+            <th>Aksi</th>
         </tr>
         <?php
         $variant_result = $conn->query("SELECT * FROM product_variants WHERE product_id = $id");
@@ -108,7 +111,6 @@
         Stok: <input type="number" name="stock" required><br>
         <button type="submit">Tambah</button>
     </form>
-
 </div>
 
 </body>
