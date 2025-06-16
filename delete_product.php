@@ -7,26 +7,18 @@ if ($_SESSION['role'] != 'Penjual') {
     exit;
 }
 
-$id = $_GET['id'];
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    header("Location: index.php");
+    exit;
+}
 
-// Hapus child table dulu biar ga error foreign key:
-$conn->query("DELETE FROM product_images WHERE product_id = $id");
-$conn->query("DELETE FROM product_variants WHERE product_id = $id");
-$conn->query("DELETE FROM products WHERE id = $id");
+$product_id = intval($_GET['id']);
+
+// Hapus produk (tapi pastikan child-child nya sudah aman dulu)
+$stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+$stmt->bind_param("i", $product_id);
+$stmt->execute();
 
 header("Location: index.php");
 exit;
 ?>
-
-<!-- Gaya tampilan pink (TIDAK mengubah kode PHP di atas) -->
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-    }
-</style>

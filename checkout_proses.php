@@ -1,5 +1,5 @@
 <?php
-// ----------- PHP ORIGINAL: transaksi (jangan diubah) ------------
+// ----------- PHP FIXED TRANSAKSI -------------
 session_start();
 include 'db.php';
 
@@ -27,12 +27,14 @@ $total = 0;
 $items = [];
 
 while ($row = $result->fetch_assoc()) {
-    $subtotal = $row['price'] * $row['quantity'];
+    // FIX pembagian harga disini bro:
+    $price_fix = $row['price'] / 1000;
+    $subtotal = $price_fix * $row['quantity'];
     $total += $subtotal;
     $items[] = [
         'variant_id' => $row['variant_id'],
         'quantity' => $row['quantity'],
-        'price' => $row['price'],
+        'price' => $price_fix,
         'subtotal' => $subtotal
     ];
 }
