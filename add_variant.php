@@ -82,10 +82,7 @@
 
     <table>
         <tr>
-            <th>Varian</th>
-            <th>Harga</th>
-            <th>Stok</th>
-            <th>Aksi</th>
+            <th>Varian</th><th>Harga</th><th>Stok</th>
         </tr>
         <?php
         $variant_result = $conn->query("SELECT * FROM product_variants WHERE product_id = $id");
@@ -94,10 +91,6 @@
             <td><?= htmlspecialchars($variant['variant_name']) ?></td>
             <td>Rp <?= number_format($variant['price'], 0, ',', '.') ?></td>
             <td><?= $variant['stock'] ?></td>
-            <td>
-                <a href="edit_variant.php?id=<?= $variant['id'] ?>">Edit</a> | 
-                <a href="delete_variant.php?id=<?= $variant['id'] ?>&product_id=<?= $id ?>" onclick="return confirm('Hapus varian ini?')">Hapus</a>
-            </td>
         </tr>
         <?php endwhile; ?>
     </table>
@@ -111,6 +104,7 @@
         Stok: <input type="number" name="stock" required><br>
         <button type="submit">Tambah</button>
     </form>
+
 </div>
 
 </body>
